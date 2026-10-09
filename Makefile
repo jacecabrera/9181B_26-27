@@ -14,7 +14,8 @@ INCDIR=$(ROOT)/include
 
 WARNFLAGS+=
 EXTRA_CFLAGS=
-EXTRA_CXXFLAGS=
+EXTRA_CXXFLAGS= -std=c++20
+# may cause issues later on, remove c++20 if so
 
 # Set to 1 to enable hot/cold linking
 USE_PACKAGE:=1
