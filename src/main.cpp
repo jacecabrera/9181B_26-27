@@ -1,4 +1,7 @@
 #include "main.h"
+#include "globals.hpp"
+#include <cstdlib>
+#include <algorithm>
 
 /**
  * A callback function for LLEMU's center button.
@@ -27,6 +30,9 @@ void initialize() {
 	pros::lcd::set_text(1, "Hello PROS User!");
 
 	pros::lcd::register_btn1_cb(on_center_button);
+
+	left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 }
 
 /**
@@ -58,7 +64,20 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+
+}
+
+ 
+//Deadband for joystick values so that the motors don't move when the joystick is near center
+
+const int DEADBAND = 5;
+int apply_deadband(int value) {
+	if (std::abs(value) < DEADBAND) {
+		return 0;
+	}
+	return value;
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -73,22 +92,30 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
-	pros::MotorGroup left_mg({1, -2, 3});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	pros::MotorGroup right_mg({-4, 5, -6});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
-
-
 	while (true) {
-		pros::lcd::print(0, "%d %d %d", (pros::lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (pros::lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (pros::lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
 
-		// Arcade control scheme
-		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		left_mg.move(dir - turn);                      // Sets left motor voltage
-		right_mg.move(dir + turn);                     // Sets right motor voltage
-		pros::delay(20);                               // Run for 20 ms then update
+		// Double Split Arcade Control
+		int dir = apply_deadband(master.get_analog(ANALOG_LEFT_Y));
+int turn = apply_deadband(master.get_analog(ANALOG_RIGHT_X));
+
+//Declare left and right motor values based on direction and turn
+int left = dir + turn;
+int right = dir - turn;
+
+constexpr int limit = 127;
+int biggest = std::max(std::abs(left), std::abs(right));  // Find the largest absolute value of left and right
+
+//loop to scale down the values if they exceed the limit
+if (biggest > limit) {
+	left = left * limit / biggest;
+	right = right * limit / biggest;
+}
+
+left_mg.move(left);
+right_mg.move(right);
+
+pros::delay(20);                               // Run for 20 ms then update
 	}
 }
