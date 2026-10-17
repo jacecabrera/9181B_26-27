@@ -2,7 +2,6 @@
 #include "globals.hpp"
 #include <cstdlib>
 #include <algorithm>
-
 /**
  * A callback function for LLEMU's center button.
  *
