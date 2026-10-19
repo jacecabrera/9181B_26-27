@@ -1,7 +1,9 @@
 #include "main.h"
 #include "globals.hpp"
+#include "heading_hold.hpp"
 #include <cstdlib>
 #include <algorithm>
+
 /**
  * A callback function for LLEMU's center button.
  *
@@ -9,13 +11,13 @@
  * "I was pressed!" and nothing.
  */
 void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
+    static bool pressed = false;
+    pressed = !pressed;
+    if (pressed) {
+        pros::lcd::set_text(2, "I was pressed!");
+    } else {
+        pros::lcd::clear_line(2);
+    }
 }
 
 /**
@@ -25,13 +27,20 @@ void on_center_button() {
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
+    pros::lcd::initialize();
+    pros::lcd::set_text(1, "Hello PROS User!");
+    pros::lcd::register_btn1_cb(on_center_button);
 
-	pros::lcd::register_btn1_cb(on_center_button);
+    left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
-	left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-	right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    imu.reset(true);
+    int startTime = pros::millis();
+    while (imu.is_calibrating()) {
+        if (pros::millis() - startTime > 3000) // Timeout safeguard
+            break; 
+        pros::delay(10);
+    }
 }
 
 /**
@@ -63,20 +72,7 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {
-
-}
-
- 
-//Deadband for joystick values so that the motors don't move when the joystick is near center
-
-const int DEADBAND = 5;
-int apply_deadband(int value) {
-	if (std::abs(value) < DEADBAND) {
-		return 0;
-	}
-	return value;
-}
+void autonomous() {}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -91,30 +87,13 @@ int apply_deadband(int value) {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-
 void opcontrol() {
-	while (true) {
+    heading_hold.reset();
 
-		// Double Split Arcade Control
-		int dir = apply_deadband(master.get_analog(ANALOG_LEFT_Y));
-int turn = apply_deadband(master.get_analog(ANALOG_RIGHT_X));
-
-//Declare left and right motor values based on direction and turn
-int left = dir + turn;
-int right = dir - turn;
-
-constexpr int limit = 127;
-int biggest = std::max(std::abs(left), std::abs(right));  // Find the largest absolute value of left and right
-
-//loop to scale down the values if they exceed the limit
-if (biggest > limit) {
-	left = left * limit / biggest;
-	right = right * limit / biggest;
-}
-
-left_mg.move(left);
-right_mg.move(right);
-
-pros::delay(20);                               // Run for 20 ms then update
-	}
+    while (true) {
+        // Run heading hold update and replace all old arcade/tank drive loops
+        heading_hold.update(master, left_mg, right_mg, imu);
+        
+        pros::delay(20);
+    }
 }

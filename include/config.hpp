@@ -1,30 +1,29 @@
 #pragma once
-
 #include "api.h"
 
-//all measurements are denoted in inches (usually)
+// All measurements are denoted in inches (usually)
 namespace b_template {
-
     namespace config {
-        //wheel, drive dimensions
-        inline constexpr double WHEEL_DIAMETER  = 2.75;
-        inline constexpr double GEAR_RATIO = 36/48 // driven_gear/driving_gear aka. output/input
-        inline constexpr double TRACK_WIDTH = nullptr // distance between the midpoints of the left and right side wheels
+        // Wheel and drive dimensions
+        inline constexpr double WHEEL_DIAMETER = 2.75;
+        inline constexpr double GEAR_RATIO = 36.0 / 48.0; // driven_gear/driving_gear aka. output/input
+        inline constexpr double TRACK_WIDTH = 0.0;        // distance between the midpoints of the left and right side wheels
 
-        //odom
-        inline constexpr double X_ODOM_DIAMETER = nullptr
-        inline constexpr double X_ODOM_CENTER_OFFSET = nullptr // distance from the center of the odom wheel to the center of the bot as a whole (from a top down view)
-        inline constexpr double Y_ODOM_DIAMETER = nullptr
-        inline constexpr double Y_ODOM_CENTER_OFFSET = nullptr
+        // Odom
+        inline constexpr double X_ODOM_DIAMETER = 0.0;
+        inline constexpr double X_ODOM_CENTER_OFFSET = 0.0; // distance from the center of the odom wheel to the center of the bot as a whole (from a top down view)
+        inline constexpr double Y_ODOM_DIAMETER = 0.0;
+        inline constexpr double Y_ODOM_CENTER_OFFSET = 0.0;
 
-        //pid constants
-        inline constexpr double LATERAL_kP
-        inline constexpr double LATERAL_kI
-        inline constexpr double LATERAL_kD
-
-        inline constexpr double ANGULAR_kP
-        inline constexpr double ANGULAR_kI
-        inline constexpr double ANGULAR_kD
+        // PID constants
+        inline constexpr double LATERAL_kP = 0.0;
+        inline constexpr double LATERAL_kI = 0.0;
+        inline constexpr double LATERAL_kD = 0.0;
+        
+        inline constexpr double ANGULAR_kP = 0.0;
+        inline constexpr double ANGULAR_kI = 0.0;
+        inline constexpr double ANGULAR_kD = 0.0;
     }
-
 }
+
+//Changed nullptr to 0.0 because nullptr is not a valid double value and contexpr is not initialized.

@@ -17,7 +17,8 @@ namespace b_template {
         double dx = target.x - this->x;
         double dy = target.y - this->y;
 
-        return std::atan2(dx, dy); // returns absolute angle in radians from current to target
+        // FIXED: atan2 expects (y, x), so dy must go first, then dx
+        return std::atan2(dy, dx); // returns absolute angle in radians from current to target
     }
 
     //method to rotate header
