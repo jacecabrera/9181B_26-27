@@ -1,6 +1,7 @@
 #pragma once
 
 #include "main.h"
+#include "drive_accel.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -37,10 +38,16 @@ struct HeadingHoldSystem {
     std::uint32_t last_print_time = 0;
     bool imu_error_notified = false;
 
+    // Ramped forward power, kept between update() calls so the ramp can build up
+    double forward_command = 0.0;
+    std::uint32_t previous_update_time_ms = 0;
+
 // Reset current state and error
     void reset() {
         is_holding = false;
         imu_error_notified = false;
+        forward_command = 0.0;
+        previous_update_time_ms = pros::millis();
     }
 
     void update(pros::Controller& master, pros::MotorGroup& left_mg, pros::MotorGroup& right_mg, pros::Imu& imu) {
@@ -56,11 +63,20 @@ struct HeadingHoldSystem {
             right_mg.move(std::clamp(rp, -127, 127));
         };
 
+        // Measures real time since the last update, then ramps the forward power.
+        // Turn is converted with the same deadband but never ramped, so it has no delay.
+        std::uint32_t now_ms = pros::millis();
+        double seconds_since_last_update = (now_ms - previous_update_time_ms) / 1000.0;
+        previous_update_time_ms = now_ms;
+        forward_command = b_template::drive_accel::ramp_forward_command(
+            throttle, forward_command, seconds_since_last_update, deadband);
+        double turn_command = b_template::drive_accel::stick_to_command(turn, deadband);
+
 
         // Both sticks neutral: release hold and stop
         if (std::abs(throttle) <= deadband && std::abs(turn) <= deadband) {
             is_holding = false;
-            drive_raw(0, 0);
+            drive_raw(std::lround(forward_command), std::lround(forward_command));
             return;
         }
 
@@ -68,7 +84,7 @@ struct HeadingHoldSystem {
         if (std::abs(turn) > deadband) {
             is_holding = false;
             last_turn_time = pros::millis();
-            drive_raw(throttle + turn, throttle - turn);
+            drive_raw(std::lround(forward_command + turn_command), std::lround(forward_command - turn_command));
             return;
         }
 
@@ -83,7 +99,7 @@ struct HeadingHoldSystem {
                 }
                 imu_error_notified = true;
             }
-            drive_raw(throttle, throttle);
+            drive_raw(std::lround(forward_command), std::lround(forward_command));
             return;
         }
 
@@ -99,7 +115,7 @@ struct HeadingHoldSystem {
                 target_heading = current_heading;
                 is_holding = true;
             } else {
-                drive_raw(throttle, throttle);
+                drive_raw(std::lround(forward_command), std::lround(forward_command));
                 return;
             }
         }
@@ -120,16 +136,15 @@ struct HeadingHoldSystem {
         double correction = p_correction + d_correction;
 
         // Proportional to throttle
-        double max_correction = std::min(40.0, 0.3 * std::abs(throttle));
+        double max_correction = std::min(40.0, 0.3 * std::abs(forward_command));
         correction = std::clamp(correction, -max_correction, max_correction);
 
         
         // Mix powers
-        int left_power = std::lround(throttle + correction);
-        int right_power = std::lround(throttle - correction);
+        int left_power = std::lround(forward_command + correction);
+        int right_power = std::lround(forward_command - correction);
 
         // Combines throttle and steering correction into motor powers
-        // If motor powers exceed 127, reduce both proportionally to maintain the difference
         if (left_power > 127) {
             int excess = left_power - 127;
             left_power -= excess;
