@@ -15,3 +15,9 @@ temp.log
 temp.errors
 *.ini
 .d/
+
+# VEX V5 Desktop Simulator
+sim/sim_runner
+sim/*.o
+sim/*.d
+sim/lvgl/

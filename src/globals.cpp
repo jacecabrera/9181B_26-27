@@ -1,5 +1,5 @@
 #include "globals.hpp"
-#include "heading_hold.hpp"
+#include "b_template/chassis/heading_hold.hpp"
 
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 

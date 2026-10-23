@@ -1,6 +1,7 @@
 #include "main.h"
+#include "b_template/auton/selector.hpp"
 #include "globals.hpp"
-#include "heading_hold.hpp"
+#include "b_template/chassis/heading_hold.hpp"
 #include <cstdlib>
 #include <algorithm>
 
@@ -41,6 +42,8 @@ void initialize() {
             break; 
         pros::delay(10);
     }
+
+    auton_selector_init();
 }
 
 /**
@@ -72,7 +75,28 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+    switch (selected_auton.routine) {
+        case AutonRoutine::RED_GOAL_RUSH:
+            // Run Red Goal Rush path
+            break;
+        case AutonRoutine::RED_SAFE_WP:
+            // Run Red Safe Win Point path
+            break;
+        case AutonRoutine::BLUE_GOAL_RUSH:
+            // Run Blue Goal Rush path
+            break;
+        case AutonRoutine::BLUE_SAFE_WP:
+            // Run Blue Safe Win Point path
+            break;
+        case AutonRoutine::SKILLS_FULL:
+            // Run Full 60s Skills path
+            break;
+        default:
+            // Default fallback action
+            break;
+    }
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
