@@ -16,7 +16,7 @@ void Chassis::drive_distance(double target_dist, utils::PIDF drive_pidf, double 
 
     while (true) {
         //avg pos of left and right sides
-        double current_pos = (left_motors.get_positions()[0] + right_motors.get_positions()[0]) / 2.0;
+        double current_pos = (left_motors.get_position() + right_motors.get_position()) / 2.0;
         double output = drive_pidf.compute(current_pos);
 
         left_motors.move_voltage(output);
