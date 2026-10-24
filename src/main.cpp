@@ -35,12 +35,9 @@ void initialize() {
     left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 
-    imu.reset(true);
-    int startTime = pros::millis();
-    while (imu.is_calibrating()) {
-        if (pros::millis() - startTime > 3000) // Timeout safeguard
-            break; 
-        pros::delay(10);
+    // Blocks until calibration finishes (about 2 s). Returns PROS_ERR on failure.
+    if (imu.reset(true) == PROS_ERR) {
+        pros::lcd::set_text(2, "IMU FAILED, check IMU port and restart");
     }
 
     auton_selector_init();
@@ -118,6 +115,6 @@ void opcontrol() {
         // Run heading hold update and replace all old arcade/tank drive loops
         heading_hold.update(master, left_mg, right_mg, imu);
         
-        pros::delay(20);
+        pros::delay(10);
     }
 }
