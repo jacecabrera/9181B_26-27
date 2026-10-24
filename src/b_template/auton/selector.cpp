@@ -67,31 +67,41 @@ static void tab_switch_event_cb(lv_event_t * e);
 static void arrow_event_cb(lv_event_t * e);
 
 void auton_selector_init(void) {
-    lv_obj_t * scr = lv_scr_act();
+    std::printf(">>> AUTON SELECTOR INIT CALLED <<<\n");
+    lv_obj_t * scr = lv_screen_active();
+
+    lv_obj_set_style_bg_color(scr, lv_color_hex(0x101010), 0); // Dark grey
+    lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
 
     // 1. Top Tab Switcher Buttons (Red, Blue, Skills)
-    lv_obj_t * btn_tab_red = lv_btn_create(scr);
+    lv_obj_t * btn_tab_red = lv_obj_create(scr);
     lv_obj_set_size(btn_tab_red, 140, 32);
     lv_obj_align(btn_tab_red, LV_ALIGN_TOP_LEFT, 15, 8);
     lv_obj_set_style_bg_color(btn_tab_red, lv_palette_main(LV_PALETTE_RED), 0);
+    lv_obj_add_flag(btn_tab_red, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(btn_tab_red, LV_OBJ_FLAG_SCROLLABLE); // <-- Disable scrolling
     lv_obj_add_event_cb(btn_tab_red, tab_switch_event_cb, LV_EVENT_CLICKED, (void*)0);
     lv_obj_t * lbl_red = lv_label_create(btn_tab_red);
     lv_label_set_text(lbl_red, "RED");
     lv_obj_center(lbl_red);
 
-    lv_obj_t * btn_tab_blue = lv_btn_create(scr);
+    lv_obj_t * btn_tab_blue = lv_obj_create(scr);  
     lv_obj_set_size(btn_tab_blue, 140, 32);
     lv_obj_align(btn_tab_blue, LV_ALIGN_TOP_LEFT, 170, 8);
     lv_obj_set_style_bg_color(btn_tab_blue, lv_palette_main(LV_PALETTE_BLUE), 0);
+    lv_obj_add_flag(btn_tab_blue, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(btn_tab_blue, LV_OBJ_FLAG_SCROLLABLE); // <-- Disable scrolling
     lv_obj_add_event_cb(btn_tab_blue, tab_switch_event_cb, LV_EVENT_CLICKED, (void*)1);
     lv_obj_t * lbl_blue = lv_label_create(btn_tab_blue);
     lv_label_set_text(lbl_blue, "BLUE");
     lv_obj_center(lbl_blue);
 
-    lv_obj_t * btn_tab_skills = lv_btn_create(scr);
+    lv_obj_t * btn_tab_skills = lv_obj_create(scr);
     lv_obj_set_size(btn_tab_skills, 140, 32);
     lv_obj_align(btn_tab_skills, LV_ALIGN_TOP_LEFT, 325, 8);
     lv_obj_set_style_bg_color(btn_tab_skills, lv_palette_main(LV_PALETTE_YELLOW), 0);
+    lv_obj_add_flag(btn_tab_skills, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(btn_tab_skills, LV_OBJ_FLAG_SCROLLABLE); // <-- Disable scrolling
     lv_obj_add_event_cb(btn_tab_skills, tab_switch_event_cb, LV_EVENT_CLICKED, (void*)2);
     lv_obj_t * lbl_skills = lv_label_create(btn_tab_skills);
     lv_label_set_text(lbl_skills, "SKILLS");
@@ -102,14 +112,14 @@ void auton_selector_init(void) {
     panel_red = lv_obj_create(scr);
     lv_obj_set_size(panel_red, 450, 145);
     lv_obj_align(panel_red, LV_ALIGN_TOP_LEFT, 15, 45);
-    lv_obj_clear_flag(panel_red, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(panel_red, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(panel_red, lv_palette_lighten(LV_PALETTE_RED, 4), 0);
     lv_obj_set_style_bg_opa(panel_red, LV_OPA_30, 0);
 
     panel_blue = lv_obj_create(scr);
     lv_obj_set_size(panel_blue, 450, 145);
     lv_obj_align(panel_blue, LV_ALIGN_TOP_LEFT, 15, 45);
-    lv_obj_clear_flag(panel_blue, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(panel_blue, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(panel_blue, lv_palette_lighten(LV_PALETTE_BLUE, 4), 0);
     lv_obj_set_style_bg_opa(panel_blue, LV_OPA_30, 0);
     lv_obj_add_flag(panel_blue, LV_OBJ_FLAG_HIDDEN);
@@ -117,19 +127,20 @@ void auton_selector_init(void) {
     panel_skills = lv_obj_create(scr);
     lv_obj_set_size(panel_skills, 450, 145);
     lv_obj_align(panel_skills, LV_ALIGN_TOP_LEFT, 15, 45);
-    lv_obj_clear_flag(panel_skills, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(panel_skills, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(panel_skills, lv_palette_lighten(LV_PALETTE_YELLOW, 4), 0);
     lv_obj_set_style_bg_opa(panel_skills, LV_OPA_30, 0);
     lv_obj_add_flag(panel_skills, LV_OBJ_FLAG_HIDDEN);
 
     // ==========================================
-    // RED TAB CONTENT (Left Arrow, Card, Right Arrow)
+    // RED TAB CONTENT
     // ==========================================
-    lv_obj_t * red_left_arrow = lv_btn_create(panel_red);
+    lv_obj_t * red_left_arrow = lv_obj_create(panel_red);
     lv_obj_set_size(red_left_arrow, 60, 90);
     lv_obj_align(red_left_arrow, LV_ALIGN_LEFT_MID, 5, 0);
     lv_obj_set_style_bg_color(red_left_arrow, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_obj_add_event_cb(red_left_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)-1); // -1 for left
+    lv_obj_add_flag(red_left_arrow, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(red_left_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)-1);
     lv_obj_t * r_l_lbl = lv_label_create(red_left_arrow);
     lv_label_set_text(r_l_lbl, "<");
     lv_obj_center(r_l_lbl);
@@ -140,24 +151,27 @@ void auton_selector_init(void) {
     lv_obj_set_style_bg_color(red_card, lv_color_white(), 0);
     red_display_lbl = lv_label_create(red_card);
     lv_label_set_text(red_display_lbl, red_names[red_index]);
+    lv_obj_set_style_text_color(red_display_lbl, lv_color_black(), 0);
     lv_obj_center(red_display_lbl);
 
-    lv_obj_t * red_right_arrow = lv_btn_create(panel_red);
+    lv_obj_t * red_right_arrow = lv_obj_create(panel_red);
     lv_obj_set_size(red_right_arrow, 60, 90);
     lv_obj_align(red_right_arrow, LV_ALIGN_RIGHT_MID, -5, 0);
     lv_obj_set_style_bg_color(red_right_arrow, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_obj_add_event_cb(red_right_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)1); // 1 for right
+    lv_obj_add_flag(red_right_arrow, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_event_cb(red_right_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)1);
     lv_obj_t * r_r_lbl = lv_label_create(red_right_arrow);
     lv_label_set_text(r_r_lbl, ">");
     lv_obj_center(r_r_lbl);
 
     // ==========================================
-    // BLUE TAB CONTENT (Left Arrow, Card, Right Arrow)
+    // BLUE TAB CONTENT
     // ==========================================
-    lv_obj_t * blue_left_arrow = lv_btn_create(panel_blue);
+    lv_obj_t * blue_left_arrow = lv_obj_create(panel_blue);
     lv_obj_set_size(blue_left_arrow, 60, 90);
     lv_obj_align(blue_left_arrow, LV_ALIGN_LEFT_MID, 5, 0);
     lv_obj_set_style_bg_color(blue_left_arrow, lv_palette_main(LV_PALETTE_BLUE), 0);
+    lv_obj_add_flag(blue_left_arrow, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(blue_left_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)-1);
     lv_obj_t * b_l_lbl = lv_label_create(blue_left_arrow);
     lv_label_set_text(b_l_lbl, "<");
@@ -169,24 +183,27 @@ void auton_selector_init(void) {
     lv_obj_set_style_bg_color(blue_card, lv_color_white(), 0);
     blue_display_lbl = lv_label_create(blue_card);
     lv_label_set_text(blue_display_lbl, blue_names[blue_index]);
+    lv_obj_set_style_text_color(blue_display_lbl, lv_color_black(), 0);
     lv_obj_center(blue_display_lbl);
 
-    lv_obj_t * blue_right_arrow = lv_btn_create(panel_blue);
+    lv_obj_t * blue_right_arrow = lv_obj_create(panel_blue);
     lv_obj_set_size(blue_right_arrow, 60, 90);
     lv_obj_align(blue_right_arrow, LV_ALIGN_RIGHT_MID, -5, 0);
     lv_obj_set_style_bg_color(blue_right_arrow, lv_palette_main(LV_PALETTE_BLUE), 0);
+    lv_obj_add_flag(blue_right_arrow, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(blue_right_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)1);
     lv_obj_t * b_r_lbl = lv_label_create(blue_right_arrow);
     lv_label_set_text(b_r_lbl, ">");
     lv_obj_center(b_r_lbl);
 
     // ==========================================
-    // SKILLS TAB CONTENT (Left Arrow, Card, Right Arrow)
+    // SKILLS TAB CONTENT
     // ==========================================
-    lv_obj_t * skills_left_arrow = lv_btn_create(panel_skills);
+    lv_obj_t * skills_left_arrow = lv_obj_create(panel_skills);
     lv_obj_set_size(skills_left_arrow, 60, 90);
     lv_obj_align(skills_left_arrow, LV_ALIGN_LEFT_MID, 5, 0);
     lv_obj_set_style_bg_color(skills_left_arrow, lv_palette_main(LV_PALETTE_YELLOW), 0);
+    lv_obj_add_flag(skills_left_arrow, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(skills_left_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)-1);
     lv_obj_t * s_l_lbl = lv_label_create(skills_left_arrow);
     lv_label_set_text(s_l_lbl, "<");
@@ -199,12 +216,14 @@ void auton_selector_init(void) {
     lv_obj_set_style_bg_color(skills_card, lv_color_white(), 0);
     skills_display_lbl = lv_label_create(skills_card);
     lv_label_set_text(skills_display_lbl, skills_names[skills_index]);
+    lv_obj_set_style_text_color(skills_display_lbl, lv_color_black(), 0);
     lv_obj_center(skills_display_lbl);
 
-    lv_obj_t * skills_right_arrow = lv_btn_create(panel_skills);
+    lv_obj_t * skills_right_arrow = lv_obj_create(panel_skills);
     lv_obj_set_size(skills_right_arrow, 60, 90);
     lv_obj_align(skills_right_arrow, LV_ALIGN_RIGHT_MID, -5, 0);
     lv_obj_set_style_bg_color(skills_right_arrow, lv_palette_main(LV_PALETTE_YELLOW), 0);
+    lv_obj_add_flag(skills_right_arrow, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_event_cb(skills_right_arrow, arrow_event_cb, LV_EVENT_CLICKED, (void*)1);
     lv_obj_t * s_r_lbl = lv_label_create(skills_right_arrow);
     lv_label_set_text(s_r_lbl, ">");
@@ -247,15 +266,15 @@ static void tab_switch_event_cb(lv_event_t * e) {
     lv_obj_add_flag(panel_skills, LV_OBJ_FLAG_HIDDEN);
 
     if (tab_index == 0) {
-        lv_obj_clear_flag(panel_red, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(panel_red, LV_OBJ_FLAG_HIDDEN);
         selected_auton.alliance = Alliance::RED;
         selected_auton.routine = red_routines[red_index];
     } else if (tab_index == 1) {
-        lv_obj_clear_flag(panel_blue, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(panel_blue, LV_OBJ_FLAG_HIDDEN);
         selected_auton.alliance = Alliance::BLUE;
         selected_auton.routine = blue_routines[blue_index];
     } else if (tab_index == 2) {
-        lv_obj_clear_flag(panel_skills, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_remove_flag(panel_skills, LV_OBJ_FLAG_HIDDEN);
         selected_auton.alliance = Alliance::SKILLS;
         selected_auton.routine = skills_routines[skills_index];
     }
