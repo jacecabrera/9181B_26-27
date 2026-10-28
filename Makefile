@@ -1,3 +1,4 @@
+export PATH := /home/jace/.local/opt/arm-none-eabi/bin:$(PATH)
 ################################################################################
 ######################### User configurable parameters #########################
 # filename extensions

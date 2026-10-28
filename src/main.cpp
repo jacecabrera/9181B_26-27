@@ -1,25 +1,13 @@
 #include "main.h"
+
 #include "b_template/auton/selector.hpp"
+#include "b_template/auton/autons.hpp"
+
 #include "globals.hpp"
 #include "b_template/chassis/heading_hold.hpp"
+#include "b_template/subsystem/claw.hpp"
 #include <cstdlib>
 #include <algorithm>
-
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-    static bool pressed = false;
-    pressed = !pressed;
-    if (pressed) {
-        pros::lcd::set_text(2, "I was pressed!");
-    } else {
-        pros::lcd::clear_line(2);
-    }
-}
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -37,8 +25,6 @@ void initialize() {
     if (imu.reset(true) == PROS_ERR) {
         pros::lcd::set_text(2, "IMU FAILED, check IMU port and restart");
     }
-
-    auton_selector_init();
 }
 
 /**
@@ -47,7 +33,7 @@ void initialize() {
  * the robot is enabled, this task will exit.
  */
 void disabled() {}
-
+//* */
 /**
  * Runs after initialize(), and before autonomous when connected to the Field
  * Management System or the VEX Competition Switch. This is intended for
@@ -71,6 +57,9 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+    run_selected_auton();
+
+    /** 
     switch (selected_auton.routine) {
         case AutonRoutine::RED_GOAL_RUSH:
             // Run Red Goal Rush path
@@ -91,6 +80,7 @@ void autonomous() {
             // Default fallback action
             break;
     }
+    */
 }
 
 /**
@@ -107,12 +97,22 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    heading_hold.reset();
+    //heading_hold.reset();
 
     while (true) {
         // Run heading hold update and replace all old arcade/tank drive loops
-        heading_hold.update(master, left_mg, right_mg, imu);
+        //heading_hold.update(master, left_mg, right_mg, imu);
         
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+            claw.spin(127);  // Spins full speed forward
+        } 
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+            claw.spin(-127); // Spins backward
+        } 
+        else {
+            claw.stop();
+        }
+
         pros::delay(10);
     }
 }
