@@ -97,11 +97,11 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    /eading_hold.reset();
+    //heading_hold.reset();
 
     while (true) {
         // Run heading hold update and replace all old arcade/tank drive loops
-        heading_hold.update(master, left_mg, right_mg, imu);
+        //heading_hold.update(master, left_mg, right_mg, imu);
         
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
             claw.spin(127);  // Spins full speed forward
