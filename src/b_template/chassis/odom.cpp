@@ -1,4 +1,5 @@
 #include "b_template/chassis/odom.hpp"
+#include "pros/error.h"
 #include <cmath>
 
 namespace b_template {
