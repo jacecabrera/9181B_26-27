@@ -1,5 +1,10 @@
-#pragma once
-#include "globals.hpp"
+#ifndef B_TEMPLATE_SUBSYSTEM_CLAW_HPP
+#define B_TEMPLATE_SUBSYSTEM_CLAW_HPP
+
+#include "main.h"
+
+namespace b_template {
+namespace subsystem {
 
 class Claw {
 private:
@@ -11,4 +16,7 @@ public:
     void stop();
 };
 
-extern Claw claw;
+} // namespace subsystem
+} // namespace b_template
+
+#endif // B_TEMPLATE_SUBSYSTEM_CLAW_HPP

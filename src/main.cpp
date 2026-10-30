@@ -4,6 +4,7 @@
 #include "b_template/auton/autons.hpp"
 
 #include "globals.hpp"
+#include "b_template/subsystem/lift.hpp"
 #include "b_template/chassis/heading_hold.hpp"
 #include "b_template/subsystem/claw.hpp"
 #include <cstdlib>
@@ -16,6 +17,7 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+    /** 
     auton_selector_init();
 
     left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -25,6 +27,7 @@ void initialize() {
     if (imu.reset(true) == PROS_ERR) {
         pros::lcd::set_text(2, "IMU FAILED, check IMU port and restart");
     }
+    */
 }
 
 /**
@@ -97,22 +100,32 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    heading_hold.reset();
+    //heading_hold.reset();
 
     while (true) {
         // Run heading hold update and replace all old arcade/tank drive loops
-        heading_hold.update(master, left_mg, right_mg, imu);
+        //heading_hold.update(master, left_mg, right_mg, imu);
         
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-            claw.spin(127);  // Spins full speed forward
+            claw.spin(127);  
         } 
-        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            claw.spin(-127); // Spins backward
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+            claw.spin(-127); 
         } 
         else {
             claw.stop();
         }
 
+        // --- Lift Controls (L1 / L2) ---
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+            lift.jog(jog_speed);    // Move target up
+        } 
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+            lift.jog(-jog_speed); // Move target down
+        }
+
+        // Run the PIDF loop and apply motor voltage to ports 20 & 11
+        lift.update();
         pros::delay(10);
     }
 }

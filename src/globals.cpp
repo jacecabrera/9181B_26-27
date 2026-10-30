@@ -1,10 +1,15 @@
 #include "globals.hpp"
-#include "b_template/chassis/heading_hold.hpp"
 
+// --- Controller ---
 pros::Controller master(pros::E_CONTROLLER_MASTER);
 
-pros::MotorGroup left_mg({4, 3, 1});
-pros::MotorGroup right_mg({-6, -10, -8}); 
+// --- Drivetrain Motor Groups & Sensors ---
+// (Adjust port numbers to match your actual robot wiring)
+pros::MotorGroup left_mg({1, -2, 3}, pros::MotorGearset::blue);
+pros::MotorGroup right_mg({-4, 5, -6}, pros::MotorGearset::blue);
+pros::Imu imu(10);
 
-pros::Imu imu(2);
+// --- Subsystems & Chassis Control ---
 HeadingHoldSystem heading_hold;
+b_template::subsystem::Lift lift;
+b_template::subsystem::Claw claw(7); // Claw plugged into port 7

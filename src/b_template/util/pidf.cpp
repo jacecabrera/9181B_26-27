@@ -9,7 +9,7 @@ PIDF::PIDF(double kP, double kI, double kD, double kF, double kG, double starti,
 
 void PIDF::set_target(double target) {
     this->target = target;
-    reset();
+    //reset();
 }
 
 double PIDF::compute(double current, double target_vel) {
@@ -19,7 +19,7 @@ double PIDF::compute(double current, double target_vel) {
     if (starti == 0.0 || std::fabs(error) < starti) {
         integral += error;
     } else {
-        integral = 0.0;
+        //integral = 0.0;
     }
 
     if (max_i > 0.0) {
