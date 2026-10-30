@@ -13,7 +13,7 @@ With the turn stick neutral and throttle applied, latches the IMU heading
 and adjusts left/right motor power (PD) to hold it. Inactive while turning.
 */
 // Set to false to disable telemetry printing during competition matches
-constexpr bool HEADING_DEBUG = true;
+constexpr bool HEADING_DEBUG = false;
 
 struct PIDController {
     double kp;
@@ -28,7 +28,7 @@ struct PIDController {
     }
 };
 
-// Tune PID constants in config.hpp
+// PID constants (kp, kd) are set in the PIDController initializer inside HeadingHoldSystem
 // Automatically catch errors 
 struct HeadingHoldSystem {
     PIDController pid{2.0, 0.08};
@@ -63,6 +63,23 @@ struct HeadingHoldSystem {
             right_mg.move(std::clamp(rp, -127, 127));
         };
 
+        // Same saturation handling as the heading hold mixing below: if one side would
+        // exceed full power, shift both sides down together so the turn is preserved
+        auto drive_with_saturation_shift = [&](double left_command, double right_command) {
+            double highest_command = std::max(left_command, right_command);
+            double lowest_command = std::min(left_command, right_command);
+
+            if (highest_command > 127.0) {
+                left_command -= highest_command - 127.0;
+                right_command -= highest_command - 127.0;
+            } 
+            else if (lowest_command < -127.0) {
+                left_command += -127.0 - lowest_command;
+                right_command += -127.0 - lowest_command;
+            }
+            drive_raw(std::lround(left_command), std::lround(right_command));
+        };
+
         // Measures real time since the last update, then ramps the forward power.
         // Turn is converted with the same deadband but never ramped, so it has no delay.
         std::uint32_t now_ms = pros::millis();
@@ -84,7 +101,7 @@ struct HeadingHoldSystem {
         if (std::abs(turn) > deadband) {
             is_holding = false;
             last_turn_time = pros::millis();
-            drive_raw(std::lround(forward_command + turn_command), std::lround(forward_command - turn_command));
+            drive_with_saturation_shift(forward_command + turn_command, forward_command - turn_command);
             return;
         }
 
