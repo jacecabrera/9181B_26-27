@@ -24,6 +24,9 @@ namespace b_template {
         inline constexpr double ANGULAR_kI = 0.0;
         inline constexpr double ANGULAR_kD = 0.0;
     }
+
+    static_assert(config::WHEEL_DIAMETER > 0.0 && config::GEAR_RATIO > 0.0,
+              "set WHEEL_DIAMETER and GEAR_RATIO in config.hpp");
 }
 
 //Changed nullptr to 0.0 because nullptr is not a valid double value and contexpr is not initialized.

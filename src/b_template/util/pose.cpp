@@ -21,6 +21,11 @@ namespace b_template {
         return std::atan2(dy, dx); // returns absolute angle in radians from current to target
     }
 
+    double Pose::heading_to(const Pose& target) const {
+        double deg = std::atan2(target.x - this->x, target.y - this->y) * 180.0 / 3.14159265358979323846;
+        return deg < 0.0 ? deg + 360.0 : deg;
+    }
+
     //method to rotate header
     //using my knowledge of the unit circle
     Pose Pose::rotate(double angle) const {

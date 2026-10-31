@@ -13,3 +13,4 @@ pros::Imu imu(10);
 HeadingHoldSystem heading_hold;
 b_template::subsystem::Lift lift;
 b_template::subsystem::Claw claw(7); // Claw plugged into port 7
+b_template::chassis::Chassis drive_chassis(left_mg, right_mg, imu);

@@ -29,6 +29,7 @@ public:
      * @return Calculated output in motor units (e.g., mV).
      */
     double compute(double current, double target_vel = 0.0);
+    double compute_error(double err, double target_vel = 0.0);
 
     /**
      * @brief Resets accumulated error, integral, and derivative states.
@@ -53,6 +54,7 @@ private:
     double prev_error = 0.0;
     double integral = 0.0;
     double derivative = 0.0;
+    bool primed = false;
 };
 
 } // namespace utils

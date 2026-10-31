@@ -11,17 +11,15 @@ class Chassis {
 public:
     Chassis(pros::MotorGroup& left_motors, pros::MotorGroup& right_motors, pros::IMU& imu);
 
-    /**
-     * @brief Drive straight for a specified distance in encoder ticks/inches.
-     */
-    void drive_distance(double target_dist, utils::PIDF drive_pidf, double timeout_ms = 3000);
+    /** target_inches is in INCHES. */
+    void drive_distance(double target_inches, utils::PIDF drive_pidf, double timeout_ms = 3000);
 
-    /**
-     * @brief Turn to an absolute heading using the IMU.
-     */
+    /** Heading in degrees, clockwise, 0-360. Takes the short way round. */
     void turn_to_angle(double target_heading, utils::PIDF turn_pidf, double timeout_ms = 2000);
 
 private:
+    double avg_position(pros::MotorGroup& g) const;
+
     pros::MotorGroup& left_motors;
     pros::MotorGroup& right_motors;
     pros::IMU& imu;
@@ -30,4 +28,4 @@ private:
 } // namespace chassis
 } // namespace b_template
 
-#endif // B_TEMPLATE_CHASSIS_CHASSIS_HPP
+#endif

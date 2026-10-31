@@ -36,7 +36,7 @@ namespace b_template {
         //ips = inches-per-second
         inline constexpr double ips_to_rpm(double ips, double wheel_diameter, double gear_ratio = 1.0) {
             double circumference = std::numbers::pi * wheel_diameter;
-            return (ips / circumference) * 60.0 * gear_ratio;
+            return (ips / circumference) * 60.0 / gear_ratio;
         }
 
         //coordinate system conversion (polar<->cartesian)

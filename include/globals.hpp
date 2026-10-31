@@ -2,6 +2,7 @@
 #include "main.h"
 #include "b_template/subsystem/lift.hpp"
 #include "b_template/subsystem/claw.hpp"
+#include "b_template/chassis/chassis.hpp"
 #include "b_template/chassis/heading_hold.hpp"
 
 // Global objects
@@ -15,5 +16,6 @@ extern pros::Imu imu;
 extern HeadingHoldSystem heading_hold;
 extern b_template::subsystem::Lift lift;
 extern b_template::subsystem::Claw claw;
+extern b_template::chassis::Chassis drive_chassis;
 
 const double jog_speed = 15.0; // Ticks per 10ms loop

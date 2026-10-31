@@ -11,6 +11,7 @@ namespace b_template {
 
         double distance_to(const Pose& target) const;
         double angle_to(const Pose& target) const;
+        double heading_to(const Pose& target) const;
         
         Pose rotate(double angle) const;
     };

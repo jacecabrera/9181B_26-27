@@ -28,6 +28,15 @@ void initialize() {
         pros::lcd::set_text(2, "IMU FAILED, check IMU port and restart");
     }
     */
+    auton_selector_init();               // first, so the screen isn't blank for 2 s
+    left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    claw.init();
+    lift.init();                         // robot must start with the lift fully down
+    if (imu.reset(true) == PROS_ERR) {   // blocks ~2 s, keep the robot still
+        master.rumble("---");
+        master.set_text(0, 0, "IMU FAILED");
+    }
 }
 
 /**
@@ -100,32 +109,30 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-    //heading_hold.reset();
+    heading_hold.reset();
+    left_mg.tare_position_all();
 
     while (true) {
-        // Run heading hold update and replace all old arcade/tank drive loops
-        //heading_hold.update(master, left_mg, right_mg, imu);
-        
+        std::printf("left motor0 pos: %.1f\n", left_mg.get_position());
+        heading_hold.update(master, left_mg, right_mg, imu);
+
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-            claw.spin(127);  
-        } 
-        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
-            claw.spin(-127); 
-        } 
-        else {
+            claw.spin(127);
+        } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) {
+            claw.spin(-127);
+        } else {
             claw.stop();
         }
 
-        // --- Lift Controls (L1 / L2) ---
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            lift.jog(jog_speed);    // Move target up
-        } 
-        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-            lift.jog(-jog_speed); // Move target down
+            lift.jog(jog_speed);
+        } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+            lift.jog(-jog_speed);
+        } else {
+            lift.hold();
         }
+        // no lift.update(): the lift task runs it
 
-        // Run the PIDF loop and apply motor voltage to ports 20 & 11
-        lift.update();
         pros::delay(10);
     }
 }

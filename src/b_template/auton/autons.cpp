@@ -1,12 +1,31 @@
 #include "b_template/auton/autons.hpp"
 #include "b_template/auton/auton_registry.hpp"
 #include "main.h"
+#include "globals.hpp"
+#include "config.hpp"
+
+namespace {
+using namespace b_template;
+
+utils::PIDF drive_pid() { return utils::PIDF(config::LATERAL_kP, config::LATERAL_kI, config::LATERAL_kD, 0.0, 0.0, 200.0, 2000.0); }
+utils::PIDF turn_pid()  { return utils::PIDF(config::ANGULAR_kP, config::ANGULAR_kI, config::ANGULAR_kD, 0.0, 0.0, 10.0, 2000.0); }
+
+void wait_for_lift(std::uint32_t timeout_ms = 1500) {
+    std::uint32_t t0 = pros::millis();
+    while (!lift.at_target() && pros::millis() - t0 < timeout_ms) pros::delay(10);
+}
+} // namespace
 
 // --- Red Routine Implementations ---
 void run_red_goal_rush(void) {
 }
 
 void run_red_safe_wp(void) {
+    drive_chassis.drive_distance(24.0, drive_pid());
+    drive_chassis.turn_to_angle(90.0, turn_pid());
+    lift.set_target(600);
+    wait_for_lift();
+    claw.spin(127); pros::delay(400); claw.stop();
 }
 
 void run_red_elims(void) {

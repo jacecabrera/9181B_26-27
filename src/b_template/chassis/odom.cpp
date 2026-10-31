@@ -26,19 +26,22 @@ odom::odom(pros::Rotation& vert, pros::Rotation& horiz, pros::Imu& imu,
 
 // Start the odometry task, which continuously updates the robot's pose
 void odom::start_task() {
+    if (task_) return;
+    while (imu_.is_calibrating()) pros::delay(10);
     vert_.reset_position();
     horiz_.reset_position();
     prev_vert_pos_ = prev_horiz_pos_ = 0.0;
-    prev_theta_ = to_rad(imu_.get_rotation());  //first reading of IMU
-    current_pose_.theta = imu_.get_rotation();  //Initialize current pose with IMU reading
+    double h0 = imu_.get_rotation();
+    if (!std::isfinite(h0)) h0 = 0.0;
+    prev_theta_ = to_rad(h0);
+    current_pose_.theta = h0;
 
     task_ = std::make_unique<pros::Task>([this] {
         while (true) {
             update();
             pros::delay(10);
         }
-    }
- );
+    });
 }
 
 void odom::update() {

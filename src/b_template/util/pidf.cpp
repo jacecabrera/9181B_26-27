@@ -1,5 +1,6 @@
 #include "b_template/util/pidf.hpp"
 #include <cmath>
+#include <algorithm>
 
 namespace b_template {
 namespace utils {
@@ -13,30 +14,27 @@ void PIDF::set_target(double target) {
 }
 
 double PIDF::compute(double current, double target_vel) {
-    error = target - current;
+    return compute_error(target - current, target_vel);
+}
 
-    //integral accumulation logic
-    if (starti == 0.0 || std::fabs(error) < starti) {
+double PIDF::compute_error(double err, double target_vel) {
+    error = err;
+
+    if (kI == 0.0) {
+        integral = 0.0;
+    } else if (starti == 0.0 || std::fabs(error) < starti) {
         integral += error;
     } else {
-        //integral = 0.0;
+        integral = 0.0;
     }
+    if (max_i > 0.0) integral = std::clamp(integral, -max_i, max_i);
 
-    if (max_i > 0.0) {
-        if (integral > max_i) integral = max_i;
-        if (integral < -max_i) integral = -max_i;
-    }
-
-    //derivative calculation
-    derivative = error - prev_error;
+    derivative = primed ? (error - prev_error) : 0.0;
     prev_error = error;
+    primed = true;
 
-    //feedback terms (PID)
     double feedback = (error * kP) + (integral * kI) + (derivative * kD);
-
-    //feedforward terms (Velocity kF + Gravity kG)
     double feedforward = (target_vel * kF) + kG;
-
     return feedback + feedforward;
 }
 
@@ -45,6 +43,7 @@ void PIDF::reset() {
     prev_error = 0.0;
     integral = 0.0;
     derivative = 0.0;
+    primed = false;
 }
 
 void PIDF::set_constants(double kP, double kI, double kD, double kF, double kG, double starti, double max_i) {

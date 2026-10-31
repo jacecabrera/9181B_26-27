@@ -51,6 +51,10 @@ namespace b_template {
                                            double deadband) {
             double step_seconds = std::min(seconds_since_last_update, LONGEST_STEP_SECONDS);
             double target_command = stick_to_command(raw_stick, deadband);
+            
+if (target_command * previous_command < 0.0) {
+    target_command = 0.0;   // brake toward zero first, then accelerate the other way
+}
 
             double previous_size = std::fabs(previous_command);
             double target_size   = std::fabs(target_command);
