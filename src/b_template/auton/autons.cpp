@@ -14,20 +14,6 @@ void wait_for_lift(std::uint32_t timeout_ms = 1500) {
     std::uint32_t t0 = pros::millis();
     while (!lift.at_target() && pros::millis() - t0 < timeout_ms) pros::delay(10);
 }
-} // namespace
-
-// --- Red Routine Implementations ---
-void run_red_goal_rush(void) {
-}
-
-void run_red_safe_wp(void) {
-    drive_chassis.drive_distance(24.0, drive_pid());
-    drive_chassis.turn_to_angle(90.0, turn_pid());
-    lift.set_target(600);
-    wait_for_lift();
-    claw.spin(127); pros::delay(400); claw.stop();
-}
-
 void run_red_elims(void) {
 }
 
