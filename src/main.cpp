@@ -69,6 +69,8 @@ void competition_initialize() {}
  * from where it left off.
  */
 void autonomous() {
+        left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
     run_selected_auton();
 
     /** 
@@ -112,6 +114,8 @@ void opcontrol() {
     heading_hold.reset();
     left_mg.tare_position_all();
 
+            left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+    right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     while (true) {
         std::printf("left motor0 pos: %.1f\n", left_mg.get_position());
         heading_hold.update(master, left_mg, right_mg, imu);

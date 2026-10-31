@@ -16,13 +16,13 @@ namespace b_template {
         inline constexpr double Y_ODOM_CENTER_OFFSET = 0.0;
 
         // PID constants
-        inline constexpr double LATERAL_kP = 0.0;
-        inline constexpr double LATERAL_kI = 0.0;
-        inline constexpr double LATERAL_kD = 0.0;
-        
-        inline constexpr double ANGULAR_kP = 0.0;
-        inline constexpr double ANGULAR_kI = 0.0;
-        inline constexpr double ANGULAR_kD = 0.0;
+inline constexpr double LATERAL_kP = 4.0;    // 1333 deg error -> ~5300 mV at start
+inline constexpr double LATERAL_kI = 0.0;
+inline constexpr double LATERAL_kD = 10.0;   // derivative is per 10 ms loop, so it needs to be bigger
+
+inline constexpr double ANGULAR_kP = 80.0;   // 90 deg error -> ~7200 mV at start
+inline constexpr double ANGULAR_kI = 0.0;
+inline constexpr double ANGULAR_kD = 400.0;
     }
 
     static_assert(config::WHEEL_DIAMETER > 0.0 && config::GEAR_RATIO > 0.0,

@@ -47,8 +47,10 @@ void Chassis::drive_distance(double target_inches, utils::PIDF drive_pidf, doubl
         if (settled_ms >= 60) break;
         pros::delay(10);
     }
-    left_motors.move_voltage(0);
-    right_motors.move_voltage(0);
+    //left_motors.move_voltage(0);
+    //right_motors.move_voltage(0);
+left_motors.brake();
+right_motors.brake();
 }
 
 void Chassis::turn_to_angle(double target_heading, utils::PIDF turn_pidf, double timeout_ms) {
