@@ -19,6 +19,7 @@ double PIDF::compute(double current, double target_vel) {
 
 double PIDF::compute_error(double err, double target_vel) {
     error = err;
+    if (primed && ((error > 0.0) != (prev_error > 0.0))) integral = 0.0;
 
     if (kI == 0.0) {
         integral = 0.0;

@@ -1,5 +1,6 @@
 #pragma once
 #include "b_template/subsystem/claw.hpp"
+#include "b_template/subsystem/lift.hpp"
 #include "selector.hpp"
 
 // Main dispatcher called from main.cpp

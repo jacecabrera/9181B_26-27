@@ -7,20 +7,20 @@ namespace b_template {
         // Wheel and drive dimensions
         inline constexpr double WHEEL_DIAMETER = 2.75;
         inline constexpr double GEAR_RATIO = 36.0 / 48.0; // driven_gear/driving_gear aka. output/input
-        inline constexpr double TRACK_WIDTH = 0.0;        // distance between the midpoints of the left and right side wheels
+        inline constexpr double TRACK_WIDTH = 10.25;        // distance between the midpoints of the left and right side wheels
 
         // Odom
-        inline constexpr double X_ODOM_DIAMETER = 0.0;
-        inline constexpr double X_ODOM_CENTER_OFFSET = 0.0; // distance from the center of the odom wheel to the center of the bot as a whole (from a top down view)
-        inline constexpr double Y_ODOM_DIAMETER = 0.0;
-        inline constexpr double Y_ODOM_CENTER_OFFSET = 0.0;
+        inline constexpr double X_ODOM_DIAMETER = 2.0;
+        inline constexpr double X_ODOM_CENTER_OFFSET = 3.0; // distance from the center of the odom wheel to the center of the bot as a whole (from a top down view)
+        inline constexpr double Y_ODOM_DIAMETER = 2.0;
+        inline constexpr double Y_ODOM_CENTER_OFFSET = 3.5;
 
         // PID constants
-inline constexpr double LATERAL_kP = 4.0;    // 1333 deg error -> ~5300 mV at start
+inline constexpr double LATERAL_kP = 20.0;    // 1333 deg error -> ~5300 mV at start
 inline constexpr double LATERAL_kI = 0.0;
 inline constexpr double LATERAL_kD = 10.0;   // derivative is per 10 ms loop, so it needs to be bigger
 
-inline constexpr double ANGULAR_kP = 80.0;   // 90 deg error -> ~7200 mV at start
+inline constexpr double ANGULAR_kP = 80.0;
 inline constexpr double ANGULAR_kI = 0.0;
 inline constexpr double ANGULAR_kD = 400.0;
     }

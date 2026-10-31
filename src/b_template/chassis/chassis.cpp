@@ -13,7 +13,10 @@ namespace {
         while (a < -180.0) a += 360.0;
         return a;
     }
-    constexpr double MAX_MV = 12000.0;
+constexpr double MAX_MV = 12000.0;
+    constexpr double MIN_TURN_MV = 1000.0;   // set from the test below
+    constexpr double TURN_TOL_DEG = 0.5;
+    constexpr double STILL_DPS = 10.0;   
 }
 
 Chassis::Chassis(pros::MotorGroup& left_motors, pros::MotorGroup& right_motors, pros::IMU& imu)
@@ -47,10 +50,8 @@ void Chassis::drive_distance(double target_inches, utils::PIDF drive_pidf, doubl
         if (settled_ms >= 60) break;
         pros::delay(10);
     }
-    //left_motors.move_voltage(0);
-    //right_motors.move_voltage(0);
-left_motors.brake();
-right_motors.brake();
+    left_motors.brake();
+    right_motors.brake();
 }
 
 void Chassis::turn_to_angle(double target_heading, utils::PIDF turn_pidf, double timeout_ms) {
@@ -60,19 +61,26 @@ void Chassis::turn_to_angle(double target_heading, utils::PIDF turn_pidf, double
 
     while (pros::millis() - start < timeout_ms) {
         double heading = imu.get_heading();
-        if (!std::isfinite(heading)) break;
+        double rate = imu.get_gyro_rate().z;          // deg/s
+        if (!std::isfinite(heading) || !std::isfinite(rate)) break;
 
         double err = wrap180(target_heading - heading);
-        double out = std::clamp(turn_pidf.compute_error(err), -MAX_MV, MAX_MV);
+        double out = turn_pidf.compute_error(err);
+
+        bool still = std::fabs(rate) < STILL_DPS;
+        if (still && std::fabs(err) > TURN_TOL_DEG && std::fabs(out) < MIN_TURN_MV)
+            out = std::copysign(MIN_TURN_MV, err);     // push only when stopped short
+        out = std::clamp(out, -MAX_MV, MAX_MV);
+
         left_motors.move_voltage(static_cast<std::int32_t>(out));
         right_motors.move_voltage(static_cast<std::int32_t>(-out));
 
-        settled_ms = (std::fabs(err) < 1.5) ? settled_ms + 10 : 0;
-        if (settled_ms >= 60) break;
+        settled_ms = (std::fabs(err) < TURN_TOL_DEG && still) ? settled_ms + 10 : 0;
+        if (settled_ms >= 50) break;
         pros::delay(10);
     }
-    left_motors.move_voltage(0);
-    right_motors.move_voltage(0);
+    left_motors.brake();
+    right_motors.brake();
 }
 
 } // namespace chassis

@@ -8,7 +8,7 @@ namespace {
 using namespace b_template;
 
 utils::PIDF drive_pid() { return utils::PIDF(config::LATERAL_kP, config::LATERAL_kI, config::LATERAL_kD, 0.0, 0.0, 200.0, 2000.0); }
-utils::PIDF turn_pid()  { return utils::PIDF(config::ANGULAR_kP, config::ANGULAR_kI, config::ANGULAR_kD, 0.0, 0.0, 10.0, 2000.0); }
+utils::PIDF turn_pid()  { return utils::PIDF(config::ANGULAR_kP, config::ANGULAR_kI, config::ANGULAR_kD, 0.0, 0.0, 15.0, 2000.0); }
 /**
 void wait_for_lift(std::uint32_t timeout_ms = 1500) {
     std::uint32_t t0 = pros::millis();
@@ -19,10 +19,22 @@ void wait_for_lift(std::uint32_t timeout_ms = 1500) {
 
 // --- Red Routine Implementations ---
 void run_red_goal_rush(void) {
+    lift.move(-127); pros::delay(385); lift.stop();
+    pros::delay(100);
+    claw.spin(127); 
+    drive_chassis.drive_distance(-12.1, drive_pid(), 1000);
+    claw.stop();
+    pros::delay(100);
+    lift.move(127); pros::delay(100); lift.stop(); pros::delay(50); claw.spin(-127); pros::delay(350); claw.stop();
+    drive_chassis.drive_distance(28, drive_pid(), 1000);
+    drive_chassis.drive_distance(-5, drive_pid(), 1000);
+    drive_chassis.drive_distance(10, drive_pid(), 1000);
+    //drive_chassis.turn_to_angle(99.0, turn_pid());
 }
 
+
 void run_red_safe_wp(void) {
-    drive_chassis.drive_distance(24.0, drive_pid());
+    //drive_chassis.drive_distance(24.0, drive_pid());
     drive_chassis.turn_to_angle(90.0, turn_pid());
     //lift.set_target(600);
     //wait_for_lift();
