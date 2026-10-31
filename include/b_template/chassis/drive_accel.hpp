@@ -16,10 +16,10 @@ namespace b_template {
         //     10.0-->0.1 s.
 
         // When stick is just past the deadband
-        inline constexpr double LIGHT_PUSH_RATE = 0.5;
+        inline constexpr double LIGHT_PUSH_RATE = 1.0;
 
         // Speed-up when the stick is fully pushed
-        inline constexpr double FULL_PUSH_RATE = 2.0;
+        inline constexpr double FULL_PUSH_RATE = 4.0;
 
         // Slow down is instant at or below this fraction of full power.
         inline constexpr double HIGH_SPEED_START_FRACTION = 0.75;

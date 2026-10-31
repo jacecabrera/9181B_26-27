@@ -31,8 +31,8 @@ void initialize() {
     auton_selector_init();               // first, so the screen isn't blank for 2 s
     left_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
     right_mg.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-    claw.init();
-    lift.init();                         // robot must start with the lift fully down
+    //claw.init();
+    //lift.init();                         // robot must start with the lift fully down
     if (imu.reset(true) == PROS_ERR) {   // blocks ~2 s, keep the robot still
         master.rumble("---");
         master.set_text(0, 0, "IMU FAILED");
@@ -125,11 +125,13 @@ void opcontrol() {
         }
 
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-            lift.jog(jog_speed);
-        } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-            lift.jog(-jog_speed);
-        } else {
-            lift.hold();
+            lift.move(127);  // Move up
+        } 
+        else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+            lift.move(-127); // Move down
+        } 
+        else {
+            lift.stop();     // Brake hold locks position
         }
         // no lift.update(): the lift task runs it
 

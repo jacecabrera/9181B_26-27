@@ -31,7 +31,7 @@ struct PIDController {
 // PID constants (kp, kd) are set in the PIDController initializer inside HeadingHoldSystem
 // Automatically catch errors 
 struct HeadingHoldSystem {
-    PIDController pid{2.0, 0.08};
+    PIDController pid{2.0, 0.2};
     bool is_holding = false;
     double target_heading = 0.0;
     std::uint32_t last_turn_time = 0;   // Uses uint32_t to match pros::millis() return type
@@ -46,9 +46,10 @@ struct HeadingHoldSystem {
     void reset() {
         is_holding = false;
         imu_error_notified = false;
-        forward_command = 0.0;
+        forward_command = 0.0; // <-- CHANGE THIS BACK TO 0.0
         previous_update_time_ms = pros::millis();
-    }
+}
+
 
     void update(pros::Controller& master, pros::MotorGroup& left_mg, pros::MotorGroup& right_mg, pros::Imu& imu) {
 
@@ -56,7 +57,7 @@ struct HeadingHoldSystem {
         int turn = master.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);    // Reads horizontal position of right joystick
         const int deadband = 5;
         const double error_deadband = 1.0;
-        const std::uint32_t latch_delay_ms = 100; // Temporarily increase to ~600 when measuring spin-down on the floor
+        const std::uint32_t latch_delay_ms = 20; // Temporarily increase to ~600 when measuring spin-down on the floor
 
         auto drive_raw = [&](int lp, int rp) {
             left_mg.move(std::clamp(lp, -127, 127));

@@ -18,4 +18,4 @@ extern b_template::subsystem::Lift lift;
 extern b_template::subsystem::Claw claw;
 extern b_template::chassis::Chassis drive_chassis;
 
-const double jog_speed = 15.0; // Ticks per 10ms loop
+const double jog_speed = 35.0; // Ticks per 10ms loop
